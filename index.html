@@ -417,8 +417,6 @@ body::before{
               <label>الفرع *</label>
               <select class="input" id="branch">
                 <option value="">اختر الفرع</option>
-
-                <!-- ✅ الفروع الحقيقية (القيمة = نص الفرع بدون "فرع") -->
                 <option value="بن عبدالله بن راشد بن عبدالله">فرع بن عبدالله بن راشد بن عبدالله</option>
                 <option value="بن علي بن راشد بن محمد">فرع بن علي بن راشد بن محمد</option>
                 <option value="بن سعد بن راشد بن محمد">فرع بن سعد بن راشد بن محمد</option>
@@ -435,7 +433,6 @@ body::before{
                 <option value="بن عبدالرحمن بن راشد بن عبدالله">فرع بن عبدالرحمن بن راشد بن عبدالله</option>
                 <option value="بن محمد بن راشد بن عبدالله">فرع بن محمد بن راشد بن عبدالله</option>
               </select>
-
               <div class="hint">سيتم إضافة الفرع كآخر جزء في الاسم الكامل.</div>
             </div>
           </div>
@@ -519,7 +516,6 @@ body::before{
   <div class="toast" id="toast"></div>
 
 <script>
-  // ✅ ضع رابط Apps Script هنا لاحقًا (اختياري الآن)
   const SCRIPT_URL = "PUT_YOUR_APPS_SCRIPT_WEBAPP_URL_HERE";
 
   const $ = (id)=>document.getElementById(id);
@@ -585,14 +581,11 @@ body::before{
     return el ? el.value : "male";
   }
 
-  // ✅ تعديل مهم: الفرع الآن قيمته نص جاهز ("بن ...")
-  // - يشيل "فرع" لو كانت موجودة
-  // - ويحوّل "آل" إلى "بن" (احتياط)
   function branchToNamePart(v){
     let s = normalizeSpaces(String(v||""));
     if(!s) return "";
     if(s.startsWith("فرع ")) s = s.replace(/^فرع\s+/,"");
-    s = s.replace(/\bآل\b/g,"بن");
+    s = s.replace(/\bآل\b/g,"بن"); // احتياط
     return normalizeSpaces(s);
   }
 
@@ -662,6 +655,14 @@ body::before{
       arr.push(($(`name_${i}`)?.value || ""));
     }
     return arr;
+  }
+
+  function updateReview(){
+    const b = branch.value ? ("فرع " + branchToNamePart(branch.value)) : "—";
+    const bn = bank.value.trim() ? bank.value.trim() : "—";
+    const f = receipt.files && receipt.files[0];
+    const fn = f ? f.name : "—";
+    review.value = `${fullName.value || "—"} | ${b} | ${phone.value || "—"} | ${amount.value || "—"} ريال | ${transferDate.value || "—"} | بنك: ${bn} | إيصال: ${fn}`;
   }
 
   function updateFullName(){
@@ -774,15 +775,6 @@ body::before{
     return true;
   }
 
-  function updateReview(){
-    if(!review) return;
-    const b = branch.value ? ("فرع " + branchToNamePart(branch.value)) : "—";
-    const bn = bank.value.trim() ? bank.value.trim() : "—";
-    const f = receipt.files && receipt.files[0];
-    const fn = f ? f.name : "—";
-    review.value = `${fullName.value || "—"} | ${b} | ${phone.value || "—"} | ${amount.value || "—"} ريال | ${transferDate.value || "—"} | بنك: ${bn} | إيصال: ${fn}`;
-  }
-
   function showSuccessPage(){
     $("actions").style.display = "none";
     $("cardBody").innerHTML = `
@@ -828,7 +820,7 @@ body::before{
 
       const payload = {
         fullName: fullName.value,
-        branch: branchToNamePart(branch.value),     // ✅ يخزن الفرع كنص جاهز
+        branch: branchToNamePart(branch.value),
         gender: getGender(),
         phone: "+966" + phone.value.slice(1),
         amount: String(Number(amount.value)),
@@ -860,8 +852,8 @@ body::before{
   }
 
   document.addEventListener("DOMContentLoaded", ()=>{
-    // count options 3..6
-    for(let i=3;i<=6;i++){
+    // ✅ (1) خيارات عدد خانات الاسم: 1 إلى 6
+    for(let i=1;i<=6;i++){
       const op = document.createElement("option");
       op.value = String(i);
       op.textContent = String(i);
@@ -869,6 +861,7 @@ body::before{
     }
     count.value = "4";
 
+    // max date = today
     const today = new Date().toISOString().split("T")[0];
     transferDate.setAttribute("max", today);
 
