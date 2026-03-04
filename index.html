@@ -123,7 +123,6 @@ body::before{
   pointer-events:none;
 }
 
-/* زخرفة SVG يمين وتذوب */
 .topPattern{
   position:absolute;
   inset:0;
@@ -224,23 +223,11 @@ body::before{
   box-shadow:0 0 0 4px rgba(239,68,68,.10);
 }
 
-.chips{
-  display:flex; gap:10px; flex-wrap:wrap;
-  margin-top: 2px;
-}
+.chips{display:flex; gap:10px; flex-wrap:wrap; margin-top:2px}
 .chip{
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-  padding:10px 12px;
-  border-radius:999px;
-  border:1px solid var(--line);
-  background:#fff;
-  cursor:pointer;
-  user-select:none;
-  font-weight:900;
-  font-size:13px;
-  color:#111827;
+  display:inline-flex;align-items:center;gap:8px;
+  padding:10px 12px;border-radius:999px;border:1px solid var(--line);
+  background:#fff;cursor:pointer;user-select:none;font-weight:900;font-size:13px;color:#111827;
 }
 .chip input{width:16px;height:16px}
 
@@ -516,7 +503,8 @@ body::before{
   <div class="toast" id="toast"></div>
 
 <script>
-  const SCRIPT_URL = "PUT_YOUR_APPS_SCRIPT_WEBAPP_URL_HERE";
+  // ✅ رابط Web App (Apps Script)
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwsqyN5mFty4mXq8HN0HKnSF1Mxh7cX5DdihJIoqh8DrMI8i3vOQx9naTYUnDqweE3g/exec";
 
   const $ = (id)=>document.getElementById(id);
 
@@ -585,13 +573,11 @@ body::before{
     let s = normalizeSpaces(String(v||""));
     if(!s) return "";
     if(s.startsWith("فرع ")) s = s.replace(/^فرع\s+/,"");
-    s = s.replace(/\bآل\b/g,"بن"); // احتياط
     return normalizeSpaces(s);
   }
 
   function buildFullName(parts, gender, branchValue){
     const p = parts.map(normalizeSpaces).filter(Boolean);
-
     const b = branchToNamePart(branchValue);
     if(b) p.push(b);
 
@@ -758,6 +744,7 @@ body::before{
       showToast("يرجى إرفاق إيصال (صورة أو PDF)", "error");
       return false;
     }
+
     const okMime =
       (file.type || "").startsWith("image/") ||
       (file.type === "application/pdf") ||
@@ -775,7 +762,20 @@ body::before{
     return true;
   }
 
-  function showSuccessPage(){
+  async function postToApi(payload){
+    // ✅ يرسل urlencoded (متوافق مع السكربت اللي عدلناه)
+    const res = await fetch(SCRIPT_URL,{
+      method:"POST",
+      headers:{ "Content-Type":"application/x-www-form-urlencoded" },
+      body:new URLSearchParams(payload)
+    });
+
+    const text = await res.text().catch(()=> "");
+    try { return JSON.parse(text); }
+    catch { return { ok: res.ok, raw: text }; }
+  }
+
+  function showSuccessPage(msg){
     $("actions").style.display = "none";
     $("cardBody").innerHTML = `
       <div class="successWrap">
@@ -784,29 +784,12 @@ body::before{
           <path class="tick" d="M32 52 L45 64 L70 38"></path>
         </svg>
         <h2>تم إرسال الدعم بنجاح ✅</h2>
-        <p>شكرًا لك. تم استلام بيانات الدعم.</p>
+        <p>${msg || "شكرًا لك. تم استلام بيانات الدعم."}</p>
       </div>
     `;
   }
 
-  async function postToApi(payload){
-    const res = await fetch(SCRIPT_URL,{
-      method:"POST",
-      headers:{ "Content-Type":"application/x-www-form-urlencoded" },
-      body:new URLSearchParams(payload)
-    });
-    const text = await res.text();
-    try { return JSON.parse(text); }
-    catch { return { status:"unknown", raw:text }; }
-  }
-
   async function submitDonation(){
-    if(SCRIPT_URL.includes("PUT_YOUR")){
-      showSuccessPage();
-      showToast("تم إرسال الدعم بنجاح ✅ (واجهة فقط)", "success");
-      return;
-    }
-
     const file = receipt.files[0];
     setLoading(true);
 
@@ -818,11 +801,12 @@ body::before{
         fr.readAsDataURL(file);
       });
 
+      // ✅ أسماء الحقول هنا متوافقة مع السكربت الجديد
       const payload = {
         fullName: fullName.value,
         branch: branchToNamePart(branch.value),
         gender: getGender(),
-        phone: "+966" + phone.value.slice(1),
+        phone: phone.value, // 05xxxxxxxx
         amount: String(Number(amount.value)),
         transferDate: transferDate.value,
         bank: bank.value.trim(),
@@ -833,13 +817,11 @@ body::before{
 
       const result = await postToApi(payload);
 
-      if(result.status === "success" || result.ok === true){
-        showSuccessPage();
+      if(result && result.ok){
+        showSuccessPage(`رقم العملية: ${result.donationId || "—"}${result.receiptUrl ? "<br>تم حفظ الإيصال ✅" : ""}`);
         showToast("تم إرسال الدعم بنجاح ✅", "success");
-      }else if(result.status === "duplicate"){
-        showToast("تم تسجيل دعم مشابه مسبقًا. تحقق من البيانات.", "warn");
       }else{
-        showToast("حدث خطأ غير متوقع. حاول مرة أخرى.", "error");
+        showToast(result?.message || "حدث خطأ أثناء الإرسال", "error");
         console.log("API result:", result);
       }
 
@@ -852,7 +834,7 @@ body::before{
   }
 
   document.addEventListener("DOMContentLoaded", ()=>{
-    // ✅ (1) خيارات عدد خانات الاسم: 1 إلى 6
+    // ✅ خيارات عدد خانات الاسم: 1 إلى 6
     for(let i=1;i<=6;i++){
       const op = document.createElement("option");
       op.value = String(i);
