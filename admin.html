@@ -1,1 +1,256 @@
-h
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>صندوق العائلة — لوحة الأدمن</title>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#f4f6f8; --card:#fff; --text:#0f172a; --muted:#6b7280; --line:#e5e7eb;
+      --shadow:0 22px 50px rgba(2,6,23,.10);
+      --green1:#0f5b3b; --green2:#0b3b2e; --green3:#22c55e;
+      --r:22px;
+      --danger:#ef4444;
+    }
+    *{box-sizing:border-box;font-family:"IBM Plex Sans Arabic",system-ui,-apple-system,Segoe UI,Arial}
+    html,body{height:100%; margin:0; background: radial-gradient(900px 500px at 50% 0%, rgba(15,91,59,.10), transparent 60%), var(--bg); color:var(--text);}
+    .wrap{max-width:980px;margin:0 auto;padding:22px}
+    .top{
+      background:linear-gradient(180deg,var(--green1),var(--green2));
+      color:#fff;border-radius:26px;padding:18px;box-shadow:var(--shadow);
+      display:flex;justify-content:space-between;gap:12px;align-items:flex-start;
+    }
+    .top h1{margin:0;font-size:20px;font-weight:900}
+    .top p{margin:6px 0 0;font-size:13px;opacity:.95;font-weight:700}
+    .pill{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.22);font-weight:900;font-size:12px;white-space:nowrap}
+    .grid{
+      margin-top:14px;
+      display:grid;grid-template-columns: 1fr 1fr 1fr;
+      gap:12px;
+    }
+    @media(max-width:900px){ .grid{grid-template-columns:1fr} }
+    .card{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden}
+    .cardBody{padding:16px}
+    .label{font-size:12px;color:var(--muted);font-weight:800;margin-bottom:6px}
+    .value{font-size:18px;font-weight:900;color:var(--green2)}
+    .controls{display:grid;grid-template-columns: 1fr 1fr 180px; gap:10px; align-items:end}
+    @media(max-width:900px){ .controls{grid-template-columns:1fr} }
+    .input{
+      width:100%;border:1px solid var(--line);border-radius:16px;padding:12px 12px;
+      font-weight:800;outline:none;background:#fff;
+    }
+    .input:focus{border-color:rgba(15,91,59,.55);box-shadow:0 0 0 4px rgba(15,91,59,.12)}
+    .btn{
+      border:none;border-radius:16px;padding:12px 12px;font-weight:900;cursor:pointer;
+      background:linear-gradient(180deg,var(--green1),var(--green2));color:#fff;
+    }
+    .btn:disabled{opacity:.6;cursor:not-allowed}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:10px 10px;border-bottom:1px solid #f1f5f9;text-align:right;font-weight:800;font-size:13px;vertical-align:top}
+    th{color:var(--muted);font-size:12px}
+    a{color:var(--green1);text-decoration:none}
+    .tag{display:inline-block;padding:6px 10px;border-radius:999px;background:rgba(34,197,94,.10);color:var(--green2);font-weight:900;font-size:12px}
+    .tag.pending{background:rgba(245,158,11,.10);color:#7c4a03}
+    .tag.rejected{background:rgba(239,68,68,.10);color:#7f1d1d}
+    .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);padding:12px 14px;border-radius:14px;display:none;z-index:999;font-weight:900;font-size:13px;box-shadow:0 18px 44px rgba(0,0,0,.18);background:#0B1220;color:#EEF2FF}
+    .toast.show{display:block}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top">
+      <div>
+        <h1>لوحة الأدمن — صندوق العائلة</h1>
+        <p>عرض آخر العمليات + إجمالي التبرعات + تقرير حسب الفرع (الدخول بنضيفه لاحقًا)</p>
+      </div>
+      <div class="pill" id="pill">جاري التحميل…</div>
+    </div>
+
+    <div class="grid">
+      <div class="card"><div class="cardBody">
+        <div class="label">إجمالي التبرعات</div>
+        <div class="value" id="sum">—</div>
+      </div></div>
+      <div class="card"><div class="cardBody">
+        <div class="label">عدد العمليات</div>
+        <div class="value" id="count">—</div>
+      </div></div>
+      <div class="card"><div class="cardBody">
+        <div class="label">أعلى فرع (حسب المجموع)</div>
+        <div class="value" id="topBranch">—</div>
+      </div></div>
+    </div>
+
+    <div class="card" style="margin-top:12px">
+      <div class="cardBody">
+        <div class="controls">
+          <div>
+            <div class="label">بحث (جوال / اسم)</div>
+            <input class="input" id="q" placeholder="مثال: 05xxxxxxxx أو اسم">
+          </div>
+          <div>
+            <div class="label">فلتر الفرع</div>
+            <select class="input" id="branchFilter">
+              <option value="">كل الفروع</option>
+            </select>
+          </div>
+          <div>
+            <button class="btn" id="reloadBtn">تحديث</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:12px">
+      <div class="cardBody" style="padding:0">
+        <table>
+          <thead>
+            <tr>
+              <th>الوقت</th>
+              <th>الاسم</th>
+              <th>الجوال</th>
+              <th>الفرع</th>
+              <th>المبلغ</th>
+              <th>التاريخ</th>
+              <th>الإيصال</th>
+              <th>الحالة</th>
+            </tr>
+          </thead>
+          <tbody id="tbody">
+            <tr><td colspan="8" style="padding:16px;color:var(--muted)">جاري التحميل…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+  </div>
+
+<script>
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwsqyN5mFty4mXq8HN0HKnSF1Mxh7cX5DdihJIoqh8DrMI8i3vOQx9naTYUnDqweE3g/exec";
+  const $ = (id)=>document.getElementById(id);
+
+  function toast(msg){
+    const t = $("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    clearTimeout(t._t);
+    t._t = setTimeout(()=>t.classList.remove("show"), 2600);
+  }
+
+  function fmtMoney(n){
+    const x = Number(n||0);
+    return x.toLocaleString("ar-SA") + " ريال";
+  }
+
+  function fmtTs(iso){
+    try{
+      const d = new Date(iso);
+      return d.toLocaleString("ar-SA",{hour12:true});
+    }catch{ return iso || "—"; }
+  }
+
+  function statusTag(s){
+    const x = (s||"pending").toLowerCase();
+    const cls = x === "pending" ? "pending" : (x === "rejected" ? "rejected" : "");
+    return `<span class="tag ${cls}">${x}</span>`;
+  }
+
+  let DATA = { rows:[], byBranch:[] };
+
+  function fillBranches(byBranch){
+    const sel = $("branchFilter");
+    const current = sel.value;
+    sel.innerHTML = `<option value="">كل الفروع</option>` + byBranch.map(b=>(
+      `<option value="${escapeHtml(b.branch)}">${escapeHtml(b.branch)} (${b.count})</option>`
+    )).join("");
+    sel.value = current;
+  }
+
+  function escapeHtml(s){
+    return String(s||"").replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  }
+
+  function render(){
+    const q = ($("q").value||"").trim();
+    const bf = ($("branchFilter").value||"").trim();
+
+    let rows = DATA.rows.slice();
+
+    if(bf){
+      rows = rows.filter(r => (r.branch||"").trim() === bf);
+    }
+    if(q){
+      const qq = q.replace(/\s+/g,"");
+      rows = rows.filter(r=>{
+        const a = (r.mobile||"").replace(/\s+/g,"");
+        const n = (r.fullName||"");
+        return a.includes(qq) || n.includes(q);
+      });
+    }
+
+    const tb = $("tbody");
+    if(rows.length === 0){
+      tb.innerHTML = `<tr><td colspan="8" style="padding:16px;color:var(--muted)">لا توجد نتائج</td></tr>`;
+      return;
+    }
+
+    tb.innerHTML = rows.map(r=>`
+      <tr>
+        <td>${escapeHtml(fmtTs(r.timestamp))}</td>
+        <td>${escapeHtml(r.fullName||"—")}</td>
+        <td>${escapeHtml(r.mobile||"—")}</td>
+        <td>${escapeHtml(r.branch||"—")}</td>
+        <td>${escapeHtml(fmtMoney(r.amount||0))}</td>
+        <td>${escapeHtml(r.transferDate||"—")}</td>
+        <td>${r.receiptUrl ? `<a href="${r.receiptUrl}" target="_blank" rel="noopener">فتح</a>` : "—"}</td>
+        <td>${statusTag(r.status)}</td>
+      </tr>
+    `).join("");
+  }
+
+  async function load(){
+    $("reloadBtn").disabled = true;
+    $("pill").textContent = "جاري تحميل البيانات…";
+
+    try{
+      const url = SCRIPT_URL + "?action=donations&limit=400";
+      const res = await fetch(url);
+      const json = await res.json();
+
+      if(!json.ok){
+        toast(json.message || "فشل تحميل البيانات");
+        $("pill").textContent = "فشل التحميل";
+        return;
+      }
+
+      DATA = json;
+
+      $("sum").textContent = fmtMoney(json.totals?.sum || 0);
+      $("count").textContent = (json.totals?.count || 0).toLocaleString("ar-SA");
+
+      const top = (json.byBranch && json.byBranch[0]) ? json.byBranch[0] : null;
+      $("topBranch").textContent = top ? `${top.branch} — ${fmtMoney(top.sum)}` : "—";
+
+      fillBranches(json.byBranch || []);
+      $("pill").textContent = "جاهزة ✅";
+      render();
+    }catch(e){
+      console.error(e);
+      $("pill").textContent = "تعذر الاتصال";
+      toast("تعذر الاتصال بالـ API");
+    }finally{
+      $("reloadBtn").disabled = false;
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", ()=>{
+    $("reloadBtn").addEventListener("click", load);
+    $("q").addEventListener("input", render);
+    $("branchFilter").addEventListener("change", render);
+    load();
+  });
+</script>
+</body>
+</html>
