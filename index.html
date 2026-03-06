@@ -376,7 +376,7 @@ body::before{
         <div class="step active" id="step1">
           <div class="sectionTitle">
             <span>بيانات الاسم</span>
-            <span class="hint">الجنس + خانات الاسم + الفرع</span>
+            <span class="hint">الجنس + الفرع + خانات الاسم</span>
           </div>
 
           <div class="field">
@@ -391,12 +391,6 @@ body::before{
           </div>
 
           <div class="grid2" style="margin-top:10px">
-            <div class="field">
-              <label>كم خانة للاسم؟ *</label>
-              <select class="input" id="count"></select>
-              <div class="hint">اختر عدد أجزاء الاسم التي ستكتبها (بدون الفرع).</div>
-            </div>
-
             <div class="field">
               <label>الفرع *</label>
               <select class="input" id="branch">
@@ -418,6 +412,12 @@ body::before{
                 <option value="بن محمد بن راشد بن عبدالله">آل محمد بن راشد بن عبدالله</option>
               </select>
               <div class="hint">سيتم إضافة اسم العائلة تلقائيًا في نهاية الاسم.</div>
+            </div>
+
+            <div class="field">
+              <label>كم خانة للاسم؟ *</label>
+              <select class="input" id="count"></select>
+              <div class="hint">اختر عدد أجزاء الاسم التي ستكتبها (بدون الفرع).</div>
             </div>
           </div>
 
@@ -613,7 +613,7 @@ body::before{
           ev.preventDefault();
           const next = $(`name_${i+1}`);
           if(next) next.focus();
-          else branch.focus();
+          else primaryBtn.focus();
         }
       });
 
@@ -661,6 +661,12 @@ body::before{
   function validateStep1(){
     clearInvalid();
 
+    if(!branch.value){
+      showToast("يرجى اختيار الفرع", "error");
+      markInvalid(branch);
+      return false;
+    }
+
     if(!count.value){
       showToast("يرجى اختيار عدد خانات الاسم", "error");
       markInvalid(count);
@@ -675,12 +681,6 @@ body::before{
         markInvalid(inp);
         return false;
       }
-    }
-
-    if(!branch.value){
-      showToast("يرجى اختيار الفرع", "error");
-      markInvalid(branch);
-      return false;
     }
 
     updateFullName();
