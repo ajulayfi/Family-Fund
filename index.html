@@ -8,7 +8,6 @@
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
 
   <style>
-/* ✅ قفل الزحلقة + إبقاء السكروول داخل .wrap */
 html, body{
   height:100%;
   overflow:hidden;
@@ -54,7 +53,6 @@ body{
   justify-content:center;
 }
 
-/* زخرفة خلفية خفيفة */
 body::before{
   content:"";
   position:fixed;
@@ -75,7 +73,6 @@ body::before{
   max-width:720px;
   position:relative;
   z-index:1;
-
   height:100%;
   overflow-y:auto;
   -webkit-overflow-scrolling:touch;
@@ -404,23 +401,23 @@ body::before{
               <label>الفرع *</label>
               <select class="input" id="branch">
                 <option value="">اختر الفرع</option>
-                <option value="بن عبدالله بن راشد بن عبدالله">فرع بن عبدالله بن راشد بن عبدالله</option>
-                <option value="بن علي بن راشد بن محمد">فرع بن علي بن راشد بن محمد</option>
-                <option value="بن سعد بن راشد بن محمد">فرع بن سعد بن راشد بن محمد</option>
-                <option value="بن عيسى بن محمد">فرع بن عيسى بن محمد</option>
-                <option value="بن إبراهيم بن راشد بن محمد">فرع بن إبراهيم بن راشد بن محمد</option>
-                <option value="بن ناصر بن راشد بن محمد">فرع بن ناصر بن راشد بن محمد</option>
-                <option value="بن محمد بن راشد بن محمد">فرع بن محمد بن راشد بن محمد</option>
-                <option value="بن محمد بن عبدالعزيز بن محمد">فرع بن محمد بن عبدالعزيز بن محمد</option>
-                <option value="بن عبدالرحمن بن عبدالعزيز بن محمد">فرع بن عبدالرحمن بن عبدالعزيز بن محمد</option>
-                <option value="بن عبدالله بن عبدالعزيز بن محمد">فرع بن عبدالله بن عبدالعزيز بن محمد</option>
-                <option value="بن ناصر بن راشد بن عبدالله">فرع بن ناصر بن راشد بن عبدالله</option>
-                <option value="بن عبدالعزيز بن راشد بن عبدالله">فرع بن عبدالعزيز بن راشد بن عبدالله</option>
-                <option value="بن إبراهيم بن راشد بن عبدالله">فرع بن إبراهيم بن راشد بن عبدالله</option>
-                <option value="بن عبدالرحمن بن راشد بن عبدالله">فرع بن عبدالرحمن بن راشد بن عبدالله</option>
-                <option value="بن محمد بن راشد بن عبدالله">فرع بن محمد بن راشد بن عبدالله</option>
+                <option value="بن عبدالله بن راشد بن عبدالله">آل عبدالله بن راشد بن عبدالله</option>
+                <option value="بن علي بن راشد بن محمد">آل علي بن راشد بن محمد</option>
+                <option value="بن سعد بن راشد بن محمد">آل سعد بن راشد بن محمد</option>
+                <option value="بن عيسى بن محمد">آل عيسى بن محمد</option>
+                <option value="بن إبراهيم بن راشد بن محمد">آل إبراهيم بن راشد بن محمد</option>
+                <option value="بن ناصر بن راشد بن محمد">آل ناصر بن راشد بن محمد</option>
+                <option value="بن محمد بن راشد بن محمد">آل محمد بن راشد بن محمد</option>
+                <option value="بن محمد بن عبدالعزيز بن محمد">آل محمد بن عبدالعزيز بن محمد</option>
+                <option value="بن عبدالرحمن بن عبدالعزيز بن محمد">آل عبدالرحمن بن عبدالعزيز بن محمد</option>
+                <option value="بن عبدالله بن عبدالعزيز بن محمد">آل عبدالله بن عبدالعزيز بن محمد</option>
+                <option value="بن ناصر بن راشد بن عبدالله">آل ناصر بن راشد بن عبدالله</option>
+                <option value="بن عبدالعزيز بن راشد بن عبدالله">آل عبدالعزيز بن راشد بن عبدالله</option>
+                <option value="بن إبراهيم بن راشد بن عبدالله">آل إبراهيم بن راشد بن عبدالله</option>
+                <option value="بن عبدالرحمن بن راشد بن عبدالله">آل عبدالرحمن بن راشد بن عبدالله</option>
+                <option value="بن محمد بن راشد بن عبدالله">آل محمد بن راشد بن عبدالله</option>
               </select>
-              <div class="hint">سيتم إضافة الفرع كآخر جزء في الاسم الكامل.</div>
+              <div class="hint">سيتم إضافة اسم العائلة تلقائيًا في نهاية الاسم.</div>
             </div>
           </div>
 
@@ -444,7 +441,7 @@ body::before{
         <div class="step" id="step2">
           <div class="sectionTitle">
             <span>بيانات الدعم</span>
-            <span class="hint">الجوال + المبلغ + التاريخ + الإيصال</span>
+            <span class="hint">الجوال + المبلغ + التاريخ + البنك + الإيصال</span>
           </div>
 
           <div class="grid2">
@@ -462,7 +459,7 @@ body::before{
               <input class="input" id="transferDate" type="date">
             </div>
             <div class="field">
-              <label>اسم البنك (اختياري)</label>
+              <label>اسم البنك *</label>
               <input class="input" id="bank" placeholder="مثال: الراجحي">
             </div>
           </div>
@@ -477,12 +474,6 @@ body::before{
               <div class="fileName" id="fileName">لم يتم اختيار ملف</div>
               <input id="receipt" type="file" accept="image/*,application/pdf">
             </label>
-          </div>
-
-          <div class="field" style="margin-top:10px">
-            <label>مراجعة سريعة</label>
-            <input class="input" id="review" readonly placeholder="سيتم عرض الملخص تلقائيًا">
-            <div class="hint">ملخص العملية يظهر هنا قبل الإرسال.</div>
           </div>
         </div>
 
@@ -503,7 +494,6 @@ body::before{
   <div class="toast" id="toast"></div>
 
 <script>
-  // ✅ رابط Web App (Apps Script)
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwsqyN5mFty4mXq8HN0HKnSF1Mxh7cX5DdihJIoqh8DrMI8i3vOQx9naTYUnDqweE3g/exec";
 
   const $ = (id)=>document.getElementById(id);
@@ -519,7 +509,6 @@ body::before{
 
   const phone = $("phone"), amount = $("amount"), transferDate = $("transferDate"), bank = $("bank");
   const receipt = $("receipt"), fileName = $("fileName");
-  const review = $("review");
 
   function showToast(text, type="error"){
     const t = $("toast");
@@ -547,6 +536,7 @@ body::before{
   function clearInvalid(){
     document.querySelectorAll(".input.invalid").forEach(el=>el.classList.remove("invalid"));
   }
+
   function markInvalid(el){
     el.classList.add("invalid");
     el.focus({preventScroll:true});
@@ -573,6 +563,7 @@ body::before{
     let s = normalizeSpaces(String(v||""));
     if(!s) return "";
     if(s.startsWith("فرع ")) s = s.replace(/^فرع\s+/,"");
+    if(s.startsWith("آل ")) s = s.replace(/^آل\s+/,"بن ");
     return normalizeSpaces(s);
   }
 
@@ -643,19 +634,10 @@ body::before{
     return arr;
   }
 
-  function updateReview(){
-    const b = branch.value ? ("فرع " + branchToNamePart(branch.value)) : "—";
-    const bn = bank.value.trim() ? bank.value.trim() : "—";
-    const f = receipt.files && receipt.files[0];
-    const fn = f ? f.name : "—";
-    review.value = `${fullName.value || "—"} | ${b} | ${phone.value || "—"} | ${amount.value || "—"} ريال | ${transferDate.value || "—"} | بنك: ${bn} | إيصال: ${fn}`;
-  }
-
   function updateFullName(){
     const full = buildFullName(getNameParts(), getGender(), branch.value);
     fullName.value = full;
     fullNameBox.textContent = full || "—";
-    updateReview();
   }
 
   function setStep(n){
@@ -672,7 +654,6 @@ body::before{
       barFill.style.width = "100%";
       primaryText.textContent = "إرسال الدعم";
       secondaryBtn.style.display = "inline-block";
-      updateReview();
     }
     document.querySelector(".wrap").scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -739,6 +720,12 @@ body::before{
       return false;
     }
 
+    if(!bank.value.trim()){
+      showToast("يرجى إدخال اسم البنك", "error");
+      markInvalid(bank);
+      return false;
+    }
+
     const file = receipt.files && receipt.files[0];
     if(!file){
       showToast("يرجى إرفاق إيصال (صورة أو PDF)", "error");
@@ -749,6 +736,7 @@ body::before{
       (file.type || "").startsWith("image/") ||
       (file.type === "application/pdf") ||
       (String(file.name||"").toLowerCase().endsWith(".pdf"));
+
     if(!okMime){
       showToast("الملف يجب أن يكون صورة أو PDF", "error");
       return false;
@@ -763,7 +751,6 @@ body::before{
   }
 
   async function postToApi(payload){
-    // ✅ يرسل urlencoded (متوافق مع السكربت اللي عدلناه)
     const res = await fetch(SCRIPT_URL,{
       method:"POST",
       headers:{ "Content-Type":"application/x-www-form-urlencoded" },
@@ -801,12 +788,11 @@ body::before{
         fr.readAsDataURL(file);
       });
 
-      // ✅ أسماء الحقول هنا متوافقة مع السكربت الجديد
       const payload = {
         fullName: fullName.value,
         branch: branchToNamePart(branch.value),
         gender: getGender(),
-        phone: phone.value, // 05xxxxxxxx
+        phone: phone.value,
         amount: String(Number(amount.value)),
         transferDate: transferDate.value,
         bank: bank.value.trim(),
@@ -818,7 +804,7 @@ body::before{
       const result = await postToApi(payload);
 
       if(result && result.ok){
-        showSuccessPage(`رقم العملية: ${result.donationId || "—"}${result.receiptUrl ? "<br>تم حفظ الإيصال ✅" : ""}`);
+        showSuccessPage(`رقم العملية: ${result.donationId || "—"}`);
         showToast("تم إرسال الدعم بنجاح ✅", "success");
       }else{
         showToast(result?.message || "حدث خطأ أثناء الإرسال", "error");
@@ -834,7 +820,6 @@ body::before{
   }
 
   document.addEventListener("DOMContentLoaded", ()=>{
-    // ✅ خيارات عدد خانات الاسم: 1 إلى 6
     for(let i=1;i<=6;i++){
       const op = document.createElement("option");
       op.value = String(i);
@@ -843,7 +828,6 @@ body::before{
     }
     count.value = "4";
 
-    // max date = today
     const today = new Date().toISOString().split("T")[0];
     transferDate.setAttribute("max", today);
 
@@ -857,7 +841,6 @@ body::before{
     receipt.addEventListener("change", ()=>{
       const f = receipt.files && receipt.files[0];
       fileName.textContent = f ? f.name : "لم يتم اختيار ملف";
-      updateReview();
     });
 
     phone.addEventListener("input", ()=>{
@@ -867,7 +850,6 @@ body::before{
         const p = Math.min(pos, phone.value.length);
         try{ phone.setSelectionRange(p,p); }catch(e){}
       }
-      updateReview();
     });
 
     amount.addEventListener("input", ()=>{
@@ -880,20 +862,31 @@ body::before{
         const p = Math.min(pos, amount.value.length);
         try{ amount.setSelectionRange(p,p); }catch(e){}
       }
-      updateReview();
     });
-
-    transferDate.addEventListener("change", updateReview);
-    bank.addEventListener("input", updateReview);
 
     primaryBtn.addEventListener("click", async ()=>{
       if(step1.classList.contains("active")){
         if(!validateStep1()) return;
+
+        const confirmName = confirm(
+`تأكيد الاسم الكامل:
+
+${fullName.value}
+
+هل الاسم صحيح؟`
+        );
+
+        if(!confirmName) return;
+
         setStep(2);
         return;
       }
 
-      if(!validateStep1()){ setStep(1); return; }
+      if(!validateStep1()){
+        setStep(1);
+        return;
+      }
+
       if(!validateStep2()) return;
 
       await submitDonation();
