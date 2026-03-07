@@ -372,7 +372,6 @@ body::before{
     <div class="card">
       <div class="cardBody" id="cardBody">
 
-        <!-- STEP 1 -->
         <div class="step active" id="step1">
           <div class="sectionTitle">
             <span>بيانات الاسم</span>
@@ -395,21 +394,21 @@ body::before{
               <label>الفرع *</label>
               <select class="input" id="branch">
                 <option value="">اختر الفرع</option>
-                <option value="بن عبدالله بن راشد بن عبدالله">آل عبدالله بن راشد بن عبدالله</option>
-                <option value="بن علي بن راشد بن محمد">آل علي بن راشد بن محمد</option>
-                <option value="بن سعد بن راشد بن محمد">آل سعد بن راشد بن محمد</option>
-                <option value="بن عيسى بن محمد">آل عيسى بن محمد</option>
-                <option value="بن إبراهيم بن راشد بن محمد">آل إبراهيم بن راشد بن محمد</option>
-                <option value="بن ناصر بن راشد بن محمد">آل ناصر بن راشد بن محمد</option>
-                <option value="بن محمد بن راشد بن محمد">آل محمد بن راشد بن محمد</option>
-                <option value="بن محمد بن عبدالعزيز بن محمد">آل محمد بن عبدالعزيز بن محمد</option>
-                <option value="بن عبدالرحمن بن عبدالعزيز بن محمد">آل عبدالرحمن بن عبدالعزيز بن محمد</option>
-                <option value="بن عبدالله بن عبدالعزيز بن محمد">آل عبدالله بن عبدالعزيز بن محمد</option>
-                <option value="بن ناصر بن راشد بن عبدالله">آل ناصر بن راشد بن عبدالله</option>
-                <option value="بن عبدالعزيز بن راشد بن عبدالله">آل عبدالعزيز بن راشد بن عبدالله</option>
-                <option value="بن إبراهيم بن راشد بن عبدالله">آل إبراهيم بن راشد بن عبدالله</option>
-                <option value="بن عبدالرحمن بن راشد بن عبدالله">آل عبدالرحمن بن راشد بن عبدالله</option>
-                <option value="بن محمد بن راشد بن عبدالله">آل محمد بن راشد بن عبدالله</option>
+                <option value="عبدالله بن راشد بن عبدالله">آل عبدالله بن راشد بن عبدالله</option>
+                <option value="علي بن راشد بن محمد">آل علي بن راشد بن محمد</option>
+                <option value="سعد بن راشد بن محمد">آل سعد بن راشد بن محمد</option>
+                <option value="عيسى بن محمد">آل عيسى بن محمد</option>
+                <option value="إبراهيم بن راشد بن محمد">آل إبراهيم بن راشد بن محمد</option>
+                <option value="ناصر بن راشد بن محمد">آل ناصر بن راشد بن محمد</option>
+                <option value="محمد بن راشد بن محمد">آل محمد بن راشد بن محمد</option>
+                <option value="محمد بن عبدالعزيز بن محمد">آل محمد بن عبدالعزيز بن محمد</option>
+                <option value="عبدالرحمن بن عبدالعزيز بن محمد">آل عبدالرحمن بن عبدالعزيز بن محمد</option>
+                <option value="عبدالله بن عبدالعزيز بن محمد">آل عبدالله بن عبدالعزيز بن محمد</option>
+                <option value="ناصر بن راشد بن عبدالله">آل ناصر بن راشد بن عبدالله</option>
+                <option value="عبدالعزيز بن راشد بن عبدالله">آل عبدالعزيز بن راشد بن عبدالله</option>
+                <option value="إبراهيم بن راشد بن عبدالله">آل إبراهيم بن راشد بن عبدالله</option>
+                <option value="عبدالرحمن بن راشد بن عبدالله">آل عبدالرحمن بن راشد بن عبدالله</option>
+                <option value="محمد بن راشد بن عبدالله">آل محمد بن راشد بن عبدالله</option>
               </select>
               <div class="hint">سيتم إضافة اسم العائلة تلقائيًا في نهاية الاسم.</div>
             </div>
@@ -437,7 +436,6 @@ body::before{
           </div>
         </div>
 
-        <!-- STEP 2 -->
         <div class="step" id="step2">
           <div class="sectionTitle">
             <span>بيانات الدعم</span>
@@ -538,6 +536,7 @@ body::before{
   }
 
   function markInvalid(el){
+    if(!el) return;
     el.classList.add("invalid");
     el.focus({preventScroll:true});
   }
@@ -559,31 +558,39 @@ body::before{
     return el ? el.value : "male";
   }
 
-  function branchToNamePart(v){
-    let s = normalizeSpaces(String(v||""));
+  function getBranchNameForFullName(v){
+    return normalizeSpaces(String(v || ""))
+      .replace(/^(بن|بنت|آل|فرع)\s+/, "");
+  }
+
+  function getBranchValueForApi(v){
+    let s = normalizeSpaces(String(v || ""));
     if(!s) return "";
-    if(s.startsWith("فرع ")) s = s.replace(/^فرع\s+/,"");
-    if(s.startsWith("آل ")) s = s.replace(/^آل\s+/,"بن ");
-    return normalizeSpaces(s);
+    return "بن " + s;
   }
 
   function buildFullName(parts, gender, branchValue){
-    const p = parts.map(normalizeSpaces).filter(Boolean);
-    const b = branchToNamePart(branchValue);
-    if(b) p.push(b);
+    const clean = parts
+      .map(x => normalizeSpaces(x))
+      .filter(Boolean)
+      .map(x => x.replace(/^(بن|بنت)\s+/, ""));
 
-    if(p.length === 0) return "";
-    if(p.length === 1) return p[0];
+    const branchPart = getBranchNameForFullName(branchValue)
+      .replace(/^(بن|بنت)\s+/, "");
 
-    const joiners = [];
-    joiners.push(gender === "female" ? "بنت" : "بن");
-    for(let i=2;i<p.length;i++) joiners.push("بن");
+    const items = branchPart ? [...clean, branchPart] : clean;
 
-    let out = p[0];
-    for(let i=1;i<p.length;i++){
-      out += ` ${joiners[i-1]} ${p[i]}`;
+    if(items.length === 0) return "";
+    if(items.length === 1) return items[0];
+
+    let out = items[0];
+
+    for(let i=1;i<items.length;i++){
+      const linkWord = (gender === "female" && i === 1) ? "بنت" : "بن";
+      out += ` ${linkWord} ${items[i]}`;
     }
-    return out.trim();
+
+    return normalizeSpaces(out);
   }
 
   function rebuildNameInputs(){
@@ -643,14 +650,18 @@ body::before{
   function setStep(n){
     clearInvalid();
     if(n===1){
-      step1.classList.add("active"); step2.classList.remove("active");
-      dot1.classList.add("active"); dot2.classList.remove("active");
+      step1.classList.add("active");
+      step2.classList.remove("active");
+      dot1.classList.add("active");
+      dot2.classList.remove("active");
       barFill.style.width = "50%";
       primaryText.textContent = "التالي";
       secondaryBtn.style.display = "none";
     }else{
-      step1.classList.remove("active"); step2.classList.add("active");
-      dot2.classList.add("active"); dot1.classList.remove("active");
+      step1.classList.remove("active");
+      step2.classList.add("active");
+      dot2.classList.add("active");
+      dot1.classList.remove("active");
       barFill.style.width = "100%";
       primaryText.textContent = "إرسال الدعم";
       secondaryBtn.style.display = "inline-block";
@@ -790,7 +801,7 @@ body::before{
 
       const payload = {
         fullName: fullName.value,
-        branch: branchToNamePart(branch.value),
+        branch: getBranchValueForApi(branch.value),
         gender: getGender(),
         phone: phone.value,
         amount: String(Number(amount.value)),
