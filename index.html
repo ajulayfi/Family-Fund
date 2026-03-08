@@ -394,29 +394,29 @@ body::before{
               <label>الفرع *</label>
               <select class="input" id="branch">
                 <option value="">اختر الفرع</option>
-                <option value="عبدالله بن راشد بن عبدالله">آل عبدالله بن راشد بن عبدالله</option>
-                <option value="علي بن راشد بن محمد">آل علي بن راشد بن محمد</option>
-                <option value="سعد بن راشد بن محمد">آل سعد بن راشد بن محمد</option>
-                <option value="عيسى بن محمد">آل عيسى بن محمد</option>
-                <option value="إبراهيم بن راشد بن محمد">آل إبراهيم بن راشد بن محمد</option>
-                <option value="ناصر بن راشد بن محمد">آل ناصر بن راشد بن محمد</option>
-                <option value="محمد بن راشد بن محمد">آل محمد بن راشد بن محمد</option>
-                <option value="محمد بن عبدالعزيز بن محمد">آل محمد بن عبدالعزيز بن محمد</option>
-                <option value="عبدالرحمن بن عبدالعزيز بن محمد">آل عبدالرحمن بن عبدالعزيز بن محمد</option>
-                <option value="عبدالله بن عبدالعزيز بن محمد">آل عبدالله بن عبدالعزيز بن محمد</option>
-                <option value="ناصر بن راشد بن عبدالله">آل ناصر بن راشد بن عبدالله</option>
-                <option value="عبدالعزيز بن راشد بن عبدالله">آل عبدالعزيز بن راشد بن عبدالله</option>
-                <option value="إبراهيم بن راشد بن عبدالله">آل إبراهيم بن راشد بن عبدالله</option>
-                <option value="عبدالرحمن بن راشد بن عبدالله">آل عبدالرحمن بن راشد بن عبدالله</option>
-                <option value="محمد بن راشد بن عبدالله">آل محمد بن راشد بن عبدالله</option>
+                <option value="آل عبدالله بن راشد بن عبدالله">آل عبدالله بن راشد بن عبدالله</option>
+                <option value="آل علي بن راشد بن محمد">آل علي بن راشد بن محمد</option>
+                <option value="آل سعد بن راشد بن محمد">آل سعد بن راشد بن محمد</option>
+                <option value="آل عيسى بن محمد">آل عيسى بن محمد</option>
+                <option value="آل إبراهيم بن راشد بن محمد">آل إبراهيم بن راشد بن محمد</option>
+                <option value="آل ناصر بن راشد بن محمد">آل ناصر بن راشد بن محمد</option>
+                <option value="آل محمد بن راشد بن محمد">آل محمد بن راشد بن محمد</option>
+                <option value="آل محمد بن عبدالعزيز بن محمد">آل محمد بن عبدالعزيز بن محمد</option>
+                <option value="آل عبدالرحمن بن عبدالعزيز بن محمد">آل عبدالرحمن بن عبدالعزيز بن محمد</option>
+                <option value="آل عبدالله بن عبدالعزيز بن محمد">آل عبدالله بن عبدالعزيز بن محمد</option>
+                <option value="آل ناصر بن راشد بن عبدالله">آل ناصر بن راشد بن عبدالله</option>
+                <option value="آل عبدالعزيز بن راشد بن عبدالله">آل عبدالعزيز بن راشد بن عبدالله</option>
+                <option value="آل إبراهيم بن راشد بن عبدالله">آل إبراهيم بن راشد بن عبدالله</option>
+                <option value="آل عبدالرحمن بن راشد بن عبدالله">آل عبدالرحمن بن راشد بن عبدالله</option>
+                <option value="آل محمد بن راشد بن عبدالله">آل محمد بن راشد بن عبدالله</option>
               </select>
-              <div class="hint">سيتم إضافة اسم العائلة تلقائيًا في نهاية الاسم.</div>
+              <div class="hint">سيُحفظ الفرع في النظام بصيغة "آل"، بينما الاسم الكامل يبقى بصيغة "بن".</div>
             </div>
 
             <div class="field">
               <label>كم خانة للاسم؟ *</label>
               <select class="input" id="count"></select>
-              <div class="hint">اختر عدد أجزاء الاسم التي ستكتبها (بدون الفرع).</div>
+              <div class="hint">اختر عدد أجزاء الاسم التي ستكتبها بدون الفرع.</div>
             </div>
           </div>
 
@@ -558,39 +558,41 @@ body::before{
     return el ? el.value : "male";
   }
 
+  // للاسم الكامل فقط: نحذف "آل" حتى لا يظهر "بن آل"
   function getBranchNameForFullName(v){
-    return normalizeSpaces(String(v || ""))
-      .replace(/^(بن|بنت|آل|فرع)\s+/, "");
-  }
-
-  function getBranchValueForApi(v){
     let s = normalizeSpaces(String(v || ""));
     if(!s) return "";
-    return "بن " + s;
+
+    if(s.startsWith("فرع ")) s = s.replace(/^فرع\s+/, "");
+    if(s.startsWith("آل ")) s = s.replace(/^آل\s+/, "");
+
+    return normalizeSpaces(s);
+  }
+
+  // للإرسال إلى الشيت: نحفظ الفرع كما هو بصيغة "آل"
+  function getBranchValueForApi(v){
+    return normalizeSpaces(String(v || ""));
   }
 
   function buildFullName(parts, gender, branchValue){
-    const clean = parts
-      .map(x => normalizeSpaces(x))
-      .filter(Boolean)
-      .map(x => x.replace(/^(بن|بنت)\s+/, ""));
+    const p = parts.map(normalizeSpaces).filter(Boolean);
+    const b = getBranchNameForFullName(branchValue);
 
-    const branchPart = getBranchNameForFullName(branchValue)
-      .replace(/^(بن|بنت)\s+/, "");
+    if(b) p.push(b);
 
-    const items = branchPart ? [...clean, branchPart] : clean;
+    if(p.length === 0) return "";
+    if(p.length === 1) return p[0];
 
-    if(items.length === 0) return "";
-    if(items.length === 1) return items[0];
+    const joiners = [];
+    joiners.push(gender === "female" ? "بنت" : "بن");
+    for(let i=2;i<p.length;i++) joiners.push("بن");
 
-    let out = items[0];
-
-    for(let i=1;i<items.length;i++){
-      const linkWord = (gender === "female" && i === 1) ? "بنت" : "بن";
-      out += ` ${linkWord} ${items[i]}`;
+    let out = p[0];
+    for(let i=1;i<p.length;i++){
+      out += ` ${joiners[i-1]} ${p[i]}`;
     }
 
-    return normalizeSpaces(out);
+    return out.trim();
   }
 
   function rebuildNameInputs(){
@@ -801,7 +803,7 @@ body::before{
 
       const payload = {
         fullName: fullName.value,
-        branch: getBranchValueForApi(branch.value),
+        branch: getBranchValueForApi(branch.value), // يحفظ "آل ..."
         gender: getGender(),
         phone: phone.value,
         amount: String(Number(amount.value)),
