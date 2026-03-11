@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>إحصائيات دعم الصندوق 2026</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    :root{
+      --bg:#f4f6f8;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#6b7280;
+      --line:#e5e7eb;
+      --shadow:0 22px 50px rgba(2,6,23,.10);
+      --green1:#0f5b3b;
+      --green2:#0b3b2e;
+      --soft:#f4fff9;
+      --r:26px;
+    }
+
+    *{
+      box-sizing:border-box;
+      font-family:"IBM Plex Sans Arabic",system-ui,-apple-system,Segoe UI,Arial;
+    }
+
+    body{
+      margin:0;
+      min-height:100vh;
+      color:var(--text);
+      background:
+        radial-gradient(900px 500px at 50% 0%, rgba(15,91,59,.10), transparent 60%),
+        var(--bg);
+    }
+
+    .wrap{
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
+    }
+
+    .panel{
+      width:min(860px,100%);
+      background:var(--card);
+      border-radius:32px;
+      box-shadow:var(--shadow);
+      overflow:hidden;
+      border:1px solid rgba(15,91,59,.06);
+    }
+
+    .hero{
+      background:linear-gradient(180deg,var(--green1),var(--green2));
+      color:#fff;
+      padding:24px 20px;
+      text-align:center;
+    }
+
+    .hero h1{
+      margin:0;
+      font-size:24px;
+      font-weight:900;
+    }
+
+    .body{
+      padding:18px;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+    }
+
+    @media(max-width:640px){
+      .grid{
+        grid-template-columns:1fr;
+      }
+    }
+
+    .card{
+      background:var(--soft);
+      border:1px solid rgba(15,91,59,.08);
+      border-radius:24px;
+      padding:18px;
+      text-align:center;
+    }
+
+    .label{
+      font-size:13px;
+      color:var(--muted);
+      font-weight:800;
+      margin-bottom:8px;
+    }
+
+    .value{
+      font-size:36px;
+      line-height:1.2;
+      color:var(--green1);
+      font-weight:900;
+      word-break:break-word;
+    }
+
+    .footer{
+      margin-top:14px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+      border-top:1px solid var(--line);
+      padding-top:14px;
+    }
+
+    .lastUpdate{
+      color:var(--muted);
+      font-size:13px;
+      font-weight:800;
+    }
+
+    .status{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      color:var(--green1);
+      font-size:13px;
+      font-weight:900;
+      background:#eefbf4;
+      border:1px solid #d1fae5;
+      padding:8px 12px;
+      border-radius:999px;
+    }
+
+    .dot{
+      width:10px;
+      height:10px;
+      border-radius:50%;
+      background:var(--green1);
+      display:inline-block;
+    }
+
+    .chartCard{
+      margin-top:14px;
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:24px;
+      padding:16px;
+    }
+
+    .chartTitle{
+      font-size:15px;
+      color:var(--green2);
+      font-weight:900;
+      margin-bottom:4px;
+    }
+
+    .chartHint{
+      font-size:12px;
+      color:var(--muted);
+      font-weight:700;
+      margin-bottom:12px;
+    }
+
+    .chartWrap{
+      position:relative;
+      min-height:300px;
+    }
+
+    .error{
+      margin-top:12px;
+      color:#b91c1c;
+      font-size:13px;
+      font-weight:800;
+      min-height:20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="panel">
+      <div class="hero">
+        <h1>إحصائيات دعم الصندوق 2026</h1>
+      </div>
+
+      <div class="body">
+        <div class="grid">
+          <div class="card">
+            <div class="label">عدد الداعمين</div>
+            <div class="value" id="supporterCount">0</div>
+          </div>
+
+          <div class="card">
+            <div class="label">إجمالي الدعم</div>
+            <div class="value" id="totalAmount">0 ريال</div>
+          </div>
+        </div>
+
+        <div class="chartCard">
+          <div class="chartTitle">الدعم اليومي</div>
+          <div class="chartHint">إجمالي الدعم حسب الأيام</div>
+          <div class="chartWrap">
+            <canvas id="supportChart"></canvas>
+          </div>
+        </div>
+
+        <div class="footer">
+          <div class="lastUpdate" id="lastUpdate">آخر تحديث: —</div>
+          <div class="status">
+            <span class="dot"></span>
+            تحديث تلقائي كل 30 ثانية
+          </div>
+        </div>
+
+        <div class="error" id="errorBox"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbwWQiKr9FLzcU2wN2R68Yzvh_2dg4J2cMVkP33eetzPfg5Nj1fS0hu9MhujiGKWP8UA/exec?view=api";
+    const REFRESH_MS = 30000;
+
+    const $ = (id) => document.getElementById(id);
+
+    let refreshTimer = null;
+    let supportChart = null;
+
+    function fmtNumber(n){
+      return Number(n || 0).toLocaleString("en-US");
+    }
+
+    function fmtMoney(n){
+      return `${Number(n || 0).toLocaleString("en-US")} ريال`;
+    }
+
+    function fmtDateTime(v){
+      try{
+        const d = new Date(v);
+        if (isNaN(d.getTime())) return "—";
+        return d.toLocaleString("en-GB", {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          hour12: true
+        });
+      }catch{
+        return "—";
+      }
+    }
+
+    function setError(text){
+      $("errorBox").textContent = text || "";
+    }
+
+    function renderStats(data){
+      $("supporterCount").textContent = fmtNumber(data.supporterCount);
+      $("totalAmount").textContent = fmtMoney(data.totalAmount);
+      $("lastUpdate").textContent = "آخر تحديث: " + fmtDateTime(data.lastUpdated || new Date().toISOString());
+    }
+
+    function renderChart(chartData){
+      if (typeof Chart === "undefined") return;
+
+      const canvas = $("supportChart");
+      if (!canvas) return;
+
+      if (supportChart) {
+        supportChart.destroy();
+        supportChart = null;
+      }
+
+      supportChart = new Chart(canvas, {
+        type: "line",
+        data: {
+          labels: chartData.labels || [],
+          datasets: [{
+            label: "الدعم",
+            data: chartData.values || [],
+            fill: false,
+            tension: 0.25,
+            borderWidth: 3,
+            pointRadius: 3
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            x: {
+              ticks: {
+                maxRotation: 0,
+                autoSkip: true
+              }
+            },
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
+    }
+
+    async function loadStats(){
+      setError("");
+
+      try{
+        const response = await fetch(API_URL, {
+          method: "GET",
+          cache: "no-store"
+        });
+
+        if (!response.ok) {
+          throw new Error("HTTP " + response.status);
+        }
+
+        const data = await response.json();
+
+        if (!data || data.ok === false) {
+          throw new Error("تعذر تحميل البيانات");
+        }
+
+        renderStats(data);
+
+        if (data.chart) {
+          renderChart(data.chart);
+        } else {
+          renderChart({ labels: [], values: [] });
+        }
+
+      }catch(err){
+        setError("تعذر تحميل الإحصائيات");
+        console.error(err);
+      }
+    }
+
+    function startAutoRefresh(){
+      if (refreshTimer) clearInterval(refreshTimer);
+      refreshTimer = setInterval(loadStats, REFRESH_MS);
+    }
+
+    document.addEventListener("DOMContentLoaded", ()=>{
+      loadStats();
+      startAutoRefresh();
+    });
+  </script>
+</body>
+</html>
